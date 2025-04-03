@@ -1,0 +1,134 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# will create a kubernetes.io/dockerconfigjson secret
+# and add it to imagePullSecrets of the serviceAccount
+# i.e.
+# AUTH=$( echo -n "$REGISTRY_USER:$REGISTRY_PASS" | base64 )
+# DOCKER_CONFIG_JSON=$(echo -n '{ "auths": { "${REGISTRY_URL}": { "auth": "${AUTH}" } } }' | base64 | tr -d \"\n\")
+dockerConfigJson:
+
+imagePullSecrets: []
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70
+
+nginx:
+  image:
+    registry:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: "1.23-alpine"
+
+  docRoot: /app/public
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  livenessProbe:
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 2
+    failureThreshold: 6
+  readinessProbe:
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 2
+    failureThreshold: 5
+
+phpfpm:
+  image:
+    registry: 722465641242.dkr.ecr.eu-central-1.amazonaws.com
+    repository: repository-placeholder
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  # this should match the workdir of the image
+  # only used when `persistence.enabled = true`
+  docRoot: /app/public
+
+  extraEnv: []
+
+  service:
+    type: ClusterIP
+    port: 9000
+
+  resources:
+    limits:
+      cpu: 900m
+      memory: 896Mi
+    requests:
+      cpu: 900m
+      memory: 896Mi
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # imagePullSecrets: []
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+# runAsUser: 1000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: dns-placeholder
+  path: /
+  tls: [ ]
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "150m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3000"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3000"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3000"
+    nginx.ingress.kubernetes.io/backend-protocol: "http"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+    nginx.ingress.kubernetes.io/server-snippet: |
+      real_ip_header X-Forwarded-For;
+      set_real_ip_from 0.0.0.0/0;
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+postInstalls:
+  - bin/console doctrine:migrations:migrate -e prod --no-interaction

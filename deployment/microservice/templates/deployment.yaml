@@ -1,0 +1,113 @@
+{{- $chart_name := include "microservice-base.fullname" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $chart_name }}
+  labels:
+    {{- include "microservice-base.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "microservice-base.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nginx
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "microservice-base.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: nginx
+        checksum/values: {{ toYaml .Values | sha256sum | trunc 20 | quote }}
+    spec:
+      {{- with .Values.nginx.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "microservice-base.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ $chart_name }}-nginx
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.nginx.livenessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.nginx.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nginx.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.nginx.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.nginx.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.nginx.readinessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.nginx.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nginx.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.nginx.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.nginx.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            {{- range $name, $map := .Values.configMaps }}
+            - name: {{ $name }}
+              mountPath: {{ print $.Values.nginx.docRoot $map.path }}
+            {{- end }}
+        - name: {{ .Chart.Name }}-phpfpm
+          securityContext:
+                  {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.phpfpm.image.registry }}/{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpfpm.image.pullPolicy }}
+          env:
+              {{- with .Values.phpfpm.extraEnv }}
+                {{- toYaml . | nindent 12 }}
+              {{- end }}
+          ports:
+            - name: phpfpm
+              containerPort: 9000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.phpfpm.resources | nindent 12 }}
+          volumeMounts:
+            {{- range $name, $map := .Values.configMaps }}
+            - name: {{ $name }}
+              mountPath: {{ print $.Values.phpfpm.docRoot $map.path }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $chart_name }}-nginx
+        {{- range $name, $map := .Values.configMaps }}
+        - name: {{ $name }}
+          configMap:
+            name: {{ print $chart_name "-" $name }}
+        {{- end }}
+        {{- if $.Values.extraVolumes }}
+        {{- toYaml $.Values.extraVolumes | nindent 8 }}
+        {{- end }}

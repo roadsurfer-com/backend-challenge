@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="RSF Coding Standard Proposal"
+    xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <description>Roadsurfer coding standards</description>
+
+    <arg name="basepath" value="."/>
+    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+
+    <!-- Parse only files inside of src folder -->
+    <file>./src</file>
+
+    <!-- But exclude these files -->
+    <exclude-pattern>src/Kernel.php</exclude-pattern>
+    <exclude-pattern>*/Migration/Version*.php</exclude-pattern>
+
+    <!-- Include base ruleset -->
+    <rule ref="./phpcs.base.xml" />
+</ruleset>

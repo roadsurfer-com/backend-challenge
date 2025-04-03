@@ -1,0 +1,30 @@
+{{- if .Values.postInstalls }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ template "microservice-base.fullname" . }}-hook-post"
+  labels:
+    {{- include "microservice-base.labels" . | nindent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ template "microservice-base.fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ template "microservice-base.fullname" . }}-post-install-job
+        image: "{{ .Values.phpfpm.image.registry }}/{{ .Values.phpfpm.image.repository }}:{{ .Values.phpfpm.image.tag | default .Chart.AppVersion }}"
+        command:
+          - /bin/sh
+          - -c
+          - |
+          {{- range .Values.postInstalls }}
+            {{ . }}
+          {{- end }}
+{{- end }}

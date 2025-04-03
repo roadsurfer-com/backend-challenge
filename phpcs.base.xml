@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Pricing Microservice"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <description>Roadsurfer Coding Standard</description>
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <!-- Parse only *.php files -->
+    <arg name="extensions" value="php" />
+
+    <!-- Style is based on PSR12 -->
+    <rule ref="PSR12"/>
+
+    <!-- Custom Rules Can Go Here-->
+
+    <!-- Generic stuff https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties -->
+    <rule ref="Generic.Arrays.ArrayIndent" />
+
+    <!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties#pearfunctionsfunctioncallsignature -->
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <properties>
+            <property name="allowMultipleArguments" value="false"/>
+        </properties>
+    </rule>
+
+    <!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties#genericformattingspaceaftercast -->
+    <rule ref="Generic.Formatting.SpaceAfterCast">
+        <properties>
+            <property name="spacing" value="1" />
+        </properties>
+    </rule>
+
+    <!-- Lines can be 150 chars long -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="150"/>
+        </properties>
+    </rule>
+
+    <!-- Forbid PHP 4 constructors -->
+    <rule ref="Generic.NamingConventions.ConstructorName"/>
+
+    <!-- Forbid any content before opening tag -->
+    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag"/>
+
+    <!-- Forbid deprecated functions -->
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+
+    <!-- Forbid useless inline string concatenation -->
+    <!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties#genericstringsunnecessarystringconcat -->
+    <rule ref="Generic.Strings.UnnecessaryStringConcat">
+        <!-- But multiline is useful for readability -->
+        <properties>
+            <property name="allowMultiline" value="true"/>
+        </properties>
+    </rule>
+
+    <!-- Forbid useless empty method overrides -->
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.WhiteSpace.DisallowTabIndent"/>
+    <rule ref="Generic.CodeAnalysis.EmptyStatement" />
+
+    <!-- Slevomat styles - https://github.com/slevomat/coding-standard -->
+
+    <!-- Forbid unused use statements -->
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+        <properties>
+            <property name="searchAnnotations" value="true"/>
+        </properties>
+    </rule>
+
+    <!-- Require presence of declare(strict_types=1) -->
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+        <properties>
+            <property
+                    name="declareOnFirstLine"
+                    value="false"
+            />
+            <property
+                    name="linesCountBeforeDeclare"
+                    value="1"
+            />
+            <property
+                    name="spacesCountAroundEqualsSign"
+                    value="0"
+            />
+            <property
+                    name="linesCountAfterDeclare"
+                    value="1"
+            />
+        </properties>
+    </rule>
+</ruleset>
