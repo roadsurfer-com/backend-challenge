@@ -1,4 +1,4 @@
-# 👋 Welcome to the Roadsrufer Backend Challenge
+# 👋 Welcome to the Roadsurfer Backend Challenge
 
 ## 🎯 Goal
 Your goal is to:
