@@ -24,7 +24,7 @@ RUN if [ "${APP_ENV}" = "dev" ] || [ "${APP_ENV}" = "test" ]; then \
 
 WORKDIR /app
 
-RUN chown ${USER}:${GROUP} /php
+RUN chown ${USER}:${GROUP} /app
 
 USER ${USER}
 

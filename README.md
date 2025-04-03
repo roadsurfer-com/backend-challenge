@@ -31,5 +31,5 @@ docker-compose up # optionally -d --build --remove-orphans
 ### Installing the dependencies
 
 ```bash
-docker-compose exec php composer install
+docker-compose exec app composer install
 ```
