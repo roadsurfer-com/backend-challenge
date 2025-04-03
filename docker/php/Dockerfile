@@ -6,7 +6,7 @@ ARG GROUP=www-data
 ARG APP_ENV
 ENV APP_ENV=${APP_ENV}
 
-COPY /docker/app/conf.d/ $PHP_INI_DIR/conf.d/
+COPY /docker/php/conf.d/ $PHP_INI_DIR/conf.d/
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN if [ "${APP_ENV}" = "dev" ] || [ "${APP_ENV}" = "test" ]; then \
@@ -24,7 +24,7 @@ RUN if [ "${APP_ENV}" = "dev" ] || [ "${APP_ENV}" = "test" ]; then \
 
 WORKDIR /app
 
-RUN chown ${USER}:${GROUP} /app
+RUN chown ${USER}:${GROUP} /php
 
 USER ${USER}
 

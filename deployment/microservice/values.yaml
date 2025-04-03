@@ -24,7 +24,7 @@ nginx:
     pullPolicy: IfNotPresent
     tag: "1.23-alpine"
 
-  docRoot: /app/public
+  docRoot: /php/public
 
   service:
     type: ClusterIP
@@ -61,7 +61,7 @@ phpfpm:
 
   # this should match the workdir of the image
   # only used when `persistence.enabled = true`
-  docRoot: /app/public
+  docRoot: /php/public
 
   extraEnv: []
 
