@@ -1,35 +1,28 @@
-# Microservice base template
+# 👋 Welcome to the Roadsrufer Backend Challenge
 
-The Roadsurfer base template for creating new (micro) services. It holds only the bare minimum requirements to have
-a skeleton like application.
+## 🎯 Goal
+Your goal is to:
+- Analyze the changes introduced in the pull request
+- Identify potential issues or bugs
+- Suggest improvements in design, structure, readability, performance, and security
+- Think out loud and explain your reasoning clearly
 
-## Adjustments for new projects
+We’re interested in **how you think**, how you **communicate technical feedback**, and how you approach **realistic backend problems**.
 
-The template itself is capable to be able to run. Every project needs to adjust the configuration to it's needs.
-Parts that need to be adjusted are:
+You’ll receive a link to the pull request **30 minutes before the interview**, giving you time to prepare your thoughts.
 
-### Docker
-  * Change `server_name` to desired value
-
-### Deployment
-
-* Change values in `Chart.yaml`
-* Create `values_{APP_ENV}.yaml` files for all existing environments
-* Replace the placeholders in the deployment files
-
-Caution: The deployment has a lot of configuration values which might not be suitable for the projects needs.
-
+Good luck and enjoy! 🚐
 
 ## Installation
 
 ### Creating the containers
 
 ```bash
-docker-compose up # optionally -d --build --remove-orphans
+docker compose up # optionally -d --build --remove-orphans
 ```
 
 ### Installing the dependencies
 
 ```bash
-docker-compose exec app composer install
+docker compose exec app composer install
 ```
